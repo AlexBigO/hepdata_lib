@@ -278,9 +278,12 @@ class Variable:
             if nonzero_uncs[i]:
                 for unc in self.uncertainties:
                     if unc.is_symmetric:
+                        symerror = helpers.relative_round(unc.values[i], self.digits)
+                        if unc.is_relative:
+                            symerror = f"{symerror}%"
                         valuedict['errors'].append({
                             "symerror":
-                                helpers.relative_round(unc.values[i], self.digits),
+                                symerror,
                             "label":
                                 unc.label
                         })
@@ -727,9 +730,10 @@ class Uncertainty:
     The list entries are the uncertainty for each of the list entries in the corresponding Variable.
     """
 
-    def __init__(self, label, is_symmetric=True):
+    def __init__(self, label, is_symmetric=True, is_relative=False):
         self.label = label
         self.is_symmetric = is_symmetric
+        self.is_relative = is_relative
         # needed to make pylint happy, see https://github.com/PyCQA/pylint/issues/409
         self._values = None
         self.values = []
